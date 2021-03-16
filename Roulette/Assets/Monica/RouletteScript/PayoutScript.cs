@@ -559,15 +559,14 @@ public class PayoutScript :  MonoBehaviour
 
         _storedDic = Hot_ColdList;
 
-        if()
-        {
-            
-        }
-
-        for(int j = _storedDic.Count; j < _storedDic.Count; j++)
-        {
-            Debug.LogError(j + "   lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
-        }
+        // if(_storedDic.Count > 4)
+        // {
+            for(int j = 0; j < _storedDic.Count; j++)
+            {
+                Debug.LogError(j + "   Highest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
+            }
+        // }
+        
 
         StartCoroutine(rollDice());
 
