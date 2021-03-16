@@ -1,0 +1,32 @@
+fileFormatVersion: 2
+guid: c66e697a7a94ce94e8569f7c005076c5
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Give A Hoot
+  fontNames:
+  - Give A Hoot
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 203b3bb18cb775249b0f06ae0884a922, type: 3}
+  - {fileID: 12800000, guid: b60e8f647aeaba145a41ffb017244cd0, type: 3}
+  - {fileID: 12800000, guid: 32d53af40d311f3428941b6b92ed4e24, type: 3}
+  - {fileID: 12800000, guid: 1005cc25f3e89ca43b2d69d8ec3e6778, type: 3}
+  - {fileID: 12800000, guid: 16894e95c6fda1840b2b64e0cc263342, type: 3}
+  - {fileID: 12800000, guid: 11cba939f2f9c2743a904d94ce2cc4d0, type: 3}
+  - {fileID: 12800000, guid: 55098e8c92b2c6842b6b0af33984944e, type: 3}
+  - {fileID: 12800000, guid: a203ed0dfcf825f418f3bfd62881adb7, type: 3}
+  - {fileID: 12800000, guid: 8203a55eb8e43984b9fd2b10f953c0f6, type: 3}
+  - {fileID: 12800000, guid: 85da9d2f19b11a0439688d41646d61a8, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
