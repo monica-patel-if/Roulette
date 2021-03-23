@@ -7,13 +7,16 @@ using System.Linq;
 
 public class PayoutScript :  MonoBehaviour
 {
-    public int PayoutPts = 0;
+    public int PayoutPts = 0, _GenNo;
     public string _manualRollout;
     public GameObject ChipsOnTableObj, NomoreBetsPanel;
     public Text _BetsTxt;
     public Button _RollBtn;
     public List<int> ColVal = new List<int>();
     public List<int> StoreColVal = new List<int>();
+    public List<Text> HotNumber_List = new List<Text>();
+    public List<Text> ColdNumber_List = new List<Text>();
+    public List<string> HotList_Val = new List<string>();
     [SerializeField] public Dictionary<string, double> _graphVal = new Dictionary<string, double>();
     public Dictionary<string, double> _storedDic = new Dictionary<string, double>();
 
@@ -36,13 +39,15 @@ public class PayoutScript :  MonoBehaviour
 
     public void PayoutRoulette()
     {
+        Debug.Log("CB... " + UIManager.ins.BetsTxt.text);
+        PlayerPrefs.SetInt("CurrentBets", int.Parse(UIManager.ins.BetsTxt.text));
         _BetsTxt.text = "No More Bets";
         NomoreBetsPanel.SetActive(true);
         _RollBtn.interactable = false;
         PayoutPts = 0;
         // int _GenNo = UnityEngine.Random.Range(0, 36);
 
-        int _GenNo = int.Parse(_manualRollout);
+        _GenNo = int.Parse(_manualRollout);
         Debug.LogError("_GenNo... " + _GenNo);
 
         //Gain payout on Right bets...
@@ -344,7 +349,7 @@ public class PayoutScript :  MonoBehaviour
             string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
             _splitVal_1 = int.Parse(_finalSplit[0]);
             _splitVal_2 = int.Parse(_finalSplit[1]);
-            if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == true )
+            if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == false )
             {
                 PayoutPts = PayoutPts - RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
                 RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
@@ -559,15 +564,42 @@ public class PayoutScript :  MonoBehaviour
 
         _storedDic = Hot_ColdList;
 
-        // if(_storedDic.Count > 4)
+        // for(int j = 0; j < _storedDic.Count; j++)
         // {
-            for(int j = 0; j < _storedDic.Count; j++)
-            {
-                Debug.LogError(j + "   Highest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
-            }
+        //     Debug.LogError(j + "   Highest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value + "  Count... " + _storedDic.Count);
         // }
-        
 
+        if(_storedDic.Count > 4)
+        {
+            // for(int j = 0; j < 4; j++)
+            int m = 0;
+            for(int j = 0; j < _storedDic.Count - 4 && j < 4; j++)
+            {
+                Debug.LogError(j + "   Lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
+                ColdNumber_List[j].text = _storedDic.ElementAt(j).Key;
+            }
+            for(int k = _storedDic.Count - 1; k >= _storedDic.Count - 4; k--)       //&& k > 3
+            {
+                Debug.LogError(k + "   Hightest order...  " + _storedDic.ElementAt(k).Key + "  val... " + _storedDic.ElementAt(k).Value);
+                for(int n = m; n <= m; n++)
+                {
+                   HotNumber_List[n].text = _storedDic.ElementAt(k).Key; 
+                }
+                m++;
+                // HotNumber_List[k].text = _storedDic.ElementAt(k).Key;
+            }
+        }
+        else
+        {
+            for(int k = _storedDic.Count - 1; k >= 0 ; k--)
+            {
+                // Debug.LogError("K... " + k + "  n... " + n);
+                Debug.LogError(k +  "   Hightest order...  " + _storedDic.ElementAt(k).Key + "  val... " + _storedDic.ElementAt(k).Value);
+                HotNumber_List[k].text = _storedDic.ElementAt(k).Key;
+            }
+        }
+
+        StartCoroutine(DiceRolled());
         StartCoroutine(rollDice());
 
     }
@@ -592,5 +624,33 @@ public class PayoutScript :  MonoBehaviour
         {
             Debug.LogError(j + "   lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
         }
+    }
+
+    IEnumerator DiceRolled()
+    {
+        yield return new WaitForSeconds(2.0f);
+        GameObject RollObj = Instantiate(RouletteRules.ins.RollsPrefab);
+        RollObj.transform.SetParent(RouletteRules.ins.RollsPanel.transform.GetChild(0).transform);
+        // RollObj.transform.SetSiblingIndex(0);
+        RollObj.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+        RollObj.transform.GetComponent<RectTransform>().localScale = Vector3.one;
+        RollObj.transform.GetComponent<RectTransform>().localPosition = new Vector3(RollObj.transform.GetComponent<RectTransform>().localPosition.x, RollObj.transform.GetComponent<RectTransform>().localPosition.y, 0);
+        Roulette_Rolldata r1 = RollObj.GetComponent<Roulette_Rolldata>();
+        // r1.Currentbet_txt.text = UIManager.ins.symbolsign + RouletteRules.ins.NumberFormat(BettingRules.ins.potedAmound);
+        r1.Currentbet_txt.text = PlayerPrefs.GetInt("CurrentBets").ToString();
+        Debug.Log("Curentbets..text...  " + r1.Currentbet_txt.text);
+        r1.GeneratedNo_txt.text = _GenNo.ToString();
+        r1.Payoutpts_txt.text = PayoutPts.ToString();
+        if(PayoutPts <= 0)
+        {
+            r1.Payoutpts_txt.color = new Color(1.0f, 0, 0, 1.0f);           //REd color...
+        }
+        else
+        {
+            r1.Payoutpts_txt.color = new Color(0, 0.5f, 0, 1.0f);       // Green color...
+        }
+       
+        RollObj.GetComponent<Toggle>().group = RouletteRules.ins.RollsPanel.transform.GetChild(0).GetComponent<ToggleGroup>();
+        RouletteRules.ins.RollObjNew = RollObj;
     }
 }

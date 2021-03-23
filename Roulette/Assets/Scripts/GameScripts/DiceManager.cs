@@ -85,7 +85,7 @@ public class DiceManager : MonoBehaviour
             ManualROllBtn.SetActive(false);
             TimerObj.SetActive(false);
             NoMoreBetsBtn.SetActive(true);
-            RollDiceBtn.SetActive(true);
+            // RollDiceBtn.SetActive(true);
         }
         else if (roll_options == 3) // manual practice Single play  
         {
@@ -99,7 +99,7 @@ public class DiceManager : MonoBehaviour
             ManualROllBtn.SetActive(false);
             TimerObj.SetActive(false);
             NoMoreBetsBtn.SetActive(false);
-            RollDiceBtn.SetActive(true);
+            // RollDiceBtn.SetActive(true);
         }
         else if (roll_options == 5) // Roll dice imidiate for join in Group 
         {

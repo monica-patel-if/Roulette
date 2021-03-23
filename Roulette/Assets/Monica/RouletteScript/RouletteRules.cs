@@ -17,6 +17,7 @@ public class RouletteRules : MonoBehaviour
     public List<GameObject> StreetBets = new List<GameObject>();
     public List<GameObject> D_StreetBets = new List<GameObject>();
     public List<GameObject> OutsideBets = new List<GameObject>();
+    public GameObject RollObjNew, RollsPrefab, RollsPanel;
 
     private void Awake()
     {
@@ -215,6 +216,7 @@ public class RouletteRules : MonoBehaviour
     
             BettingRules.ins.potedAmound = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
             UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
+            // PlayerPrefs.SetInt("CurrentBets", BettingRules.ins.potedAmound);
             UIManager.ins.RackTxt.text = UIManager.ins.symbolsign + NumberFormat(currrentRackValue - BettingRules.ChipsValue);
             BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
         }
