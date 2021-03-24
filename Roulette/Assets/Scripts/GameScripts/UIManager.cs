@@ -1461,23 +1461,23 @@ public Button BetOutsideBtn;
         RollersObj.transform.GetComponent<RectTransform>().localPosition = new Vector3(RollersObj.transform.GetComponent<RectTransform>().localPosition.x, RollersObj.transform.GetComponent<RectTransform>().localPosition.y, 0);
 
 
-        // for create rolls tab 
-        GameObject RollObj = Instantiate(RollsPrefab);
-        RollObj.name = "test";
-        RollObjNew = RollObj;
-        RollObj.transform.SetParent(RollsPanel.transform.GetChild(0).transform);
-        RollObj.GetComponent<Toggle>().group = UIManager.ins.RollsPanel.transform.GetChild(0).GetComponent<ToggleGroup>();
-        RollObj.transform.SetSiblingIndex(0);
-        RollObj.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
-        RollObj.transform.GetComponent<RectTransform>().localScale = Vector3.one;
-        RollObj.transform.GetComponent<RectTransform>().localPosition = new Vector3(RollObj.transform.GetComponent<RectTransform>().localPosition.x, RollObj.transform.GetComponent<RectTransform>().localPosition.y, 0);
-        rolldata r1 = RollObj.GetComponent<rolldata>();
+        // // for create rolls tab 
+        // GameObject RollObj = Instantiate(RollsPrefab);
+        // RollObj.name = "test";
+        // RollObjNew = RollObj;
+        // RollObj.transform.SetParent(RollsPanel.transform.GetChild(0).transform);
+        // RollObj.GetComponent<Toggle>().group = UIManager.ins.RollsPanel.transform.GetChild(0).GetComponent<ToggleGroup>();
+        // RollObj.transform.SetSiblingIndex(0);
+        // RollObj.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
+        // RollObj.transform.GetComponent<RectTransform>().localScale = Vector3.one;
+        // RollObj.transform.GetComponent<RectTransform>().localPosition = new Vector3(RollObj.transform.GetComponent<RectTransform>().localPosition.x, RollObj.transform.GetComponent<RectTransform>().localPosition.y, 0);
+        // rolldata r1 = RollObj.GetComponent<rolldata>();
 
-        PlayerPrefs.SetInt("shooterNo", 1);
-        PlayerPrefs.SetInt("RolNum", 1);
-        r1.shooterTxt.text = "s" + PlayerPrefs.GetInt("shooterNo", 1);
-        r1.rollTxt.text = "r" + PlayerPrefs.GetInt("RolNum", 1);
-        r1.pointImg.sprite = spriteEdit.ins.RedDot;
+        // PlayerPrefs.SetInt("shooterNo", 1);
+        // PlayerPrefs.SetInt("RolNum", 1);
+        // r1.shooterTxt.text = "s" + PlayerPrefs.GetInt("shooterNo", 1);
+        // r1.rollTxt.text = "r" + PlayerPrefs.GetInt("RolNum", 1);
+        // r1.pointImg.sprite = spriteEdit.ins.RedDot;
         //DiceManager.ins.GetBanner();
         DiceManager.ins.SetRolOption();
     }

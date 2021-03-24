@@ -11,6 +11,7 @@ public class RouletteRules : MonoBehaviour
     public static RouletteRules ins;
     GameObject LastSelectedChips;
     public int CurrentChips;
+    public List<GameObject> Manual_StraightBets = new List<GameObject>();
     public List<GameObject> StraightBets = new List<GameObject>();
     public List<GameObject> SplitsBets = new List<GameObject>();
     public List<GameObject> SquareBets = new List<GameObject>();
