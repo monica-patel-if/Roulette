@@ -560,11 +560,33 @@ public class PayoutScript :  MonoBehaviour
                 }
             }
         }
-        int _betsValue = int.Parse(UIManager.ins.RackTxt.text);
+        string _unremovedStr = UIManager.ins.RackTxt.text;
+        int pos = _unremovedStr.IndexOf(",");
+        int _betsValue;
+        if( pos >= 0 )
+        {
+            string _racktxt_oldval = _unremovedStr.Remove(pos);
+            _betsValue = int.Parse(_racktxt_oldval);
+        }
+        else
+        {
+            _betsValue = int.Parse(UIManager.ins.RackTxt.text);
+        }
         BettingRules.ins.potedAmound = int.Parse(UIManager.ins.BetsTxt.text) - _losePayouts;
-        UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + BettingRules.ins.potedAmound; 
+        UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + BettingRules.ins.potedAmound;
         UIManager.ins.RackTxt.text = RouletteRules.ins.NumberFormat(_betsValue + (PayoutPts - BettingRules.ins.potedAmound));
-        UIManager.ins.BankRollTxt.text = RouletteRules.ins.NumberFormat( int.Parse(UIManager.ins.RackTxt.text) + BettingRules.ins.potedAmound);
+
+        string _unremovedComma = UIManager.ins.RackTxt.text;
+        int CommaPos = _unremovedComma.IndexOf(",");
+        if( CommaPos >= 0 )
+        {
+            string _racktxt_newval = _unremovedComma.Remove(CommaPos);
+            UIManager.ins.BankRollTxt.text = RouletteRules.ins.NumberFormat( int.Parse(_racktxt_newval) + BettingRules.ins.potedAmound);
+        }
+        else
+        {
+            UIManager.ins.BankRollTxt.text = RouletteRules.ins.NumberFormat( int.Parse(UIManager.ins.RackTxt.text) + BettingRules.ins.potedAmound);
+        }
         Debug.Log("_betsValue... " + _betsValue + "  " + "  _losePayouts... " + _losePayouts);
         Debug.LogError("Payouts... " + PayoutPts);
 
@@ -577,14 +599,14 @@ public class PayoutScript :  MonoBehaviour
 
                 if(_graphVal.ContainsKey(_GenNo.ToString()))
                 {
-                    Debug.LogError( _GenNo + " _graphVal Key..1.. " + _graphVal[_GenNo.ToString()]);
+                    // Debug.LogError( _GenNo + " _graphVal Key..1.. " + _graphVal[_GenNo.ToString()]);
                     _graphVal[_GenNo.ToString()] = UIManager.ins.myGraphStatastics.DataSource.GetValue(_GenNo.ToString(), UIManager.ins.barGroupName);
-                    Debug.LogError( _GenNo + " _graphVal Key..2.. " + _graphVal[_GenNo.ToString()]);
+                    // Debug.LogError( _GenNo + " _graphVal Key..2.. " + _graphVal[_GenNo.ToString()]);
                 }
                 else
                 {
                     _graphVal.Add(_GenNo.ToString(), UIManager.ins.myGraphStatastics.DataSource.GetValue(_GenNo.ToString(), UIManager.ins.barGroupName));
-                    Debug.LogError( _GenNo + " _graphVal Key..3.. " + _graphVal[_GenNo.ToString()]);
+                    // Debug.LogError( _GenNo + " _graphVal Key..3.. " + _graphVal[_GenNo.ToString()]);
                 }
             }
         }
@@ -617,6 +639,32 @@ public class PayoutScript :  MonoBehaviour
             for(int j = 0; j < _storedDic.Count - 4 && j < 4; j++)
             {
                 Debug.LogError(j + "   Lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
+                for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
+                {
+                    if(int.Parse(_storedDic.ElementAt(j).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
+                    {
+                        Debug.LogError("_GenNo... " + _GenNo);
+                        if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                        {
+                            Debug.Log("1 low");
+                            ColdNumber_List[j].transform.parent.gameObject.SetActive(true);
+                            ColdNumber_List[j].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
+                        }
+                        else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
+                        {
+                            Debug.Log("2 low");
+                            ColdNumber_List[j].transform.parent.gameObject.SetActive(true);
+                            ColdNumber_List[j].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
+                        }
+                        else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                        {
+                            Debug.Log("3 low");
+                            ColdNumber_List[j].transform.parent.gameObject.SetActive(true);
+                            ColdNumber_List[j].transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
+                        }
+                        break;
+                    }
+                }
                 ColdNumber_List[j].text = _storedDic.ElementAt(j).Key;
             }
             for(int k = _storedDic.Count - 1; k >= _storedDic.Count - 4; k--)       //&& k > 3
@@ -631,6 +679,34 @@ public class PayoutScript :  MonoBehaviour
                     for(int n = m; n <= m; n++)
                     {
                         Debug.Log("n...  " + n + "  m... " + m);
+                        for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
+                        {
+                            if(int.Parse(_storedDic.ElementAt(k).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
+                            {
+                                Debug.LogError("_gen... " + _GenNo);
+                                if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                                {
+                                    Debug.Log("1 high");
+                                    HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                    HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
+                                    break;
+                                }
+                                else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
+                                {
+                                    Debug.Log("2 high");
+                                    HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                    HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
+                                    break;
+                                }
+                                else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                                {
+                                    Debug.Log("3 high");
+                                    HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                    HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
+                                    break;
+                                }
+                            }
+                        }
                         HotNumber_List[n].text = _storedDic.ElementAt(k).Key;
                     }
                 }
@@ -647,7 +723,32 @@ public class PayoutScript :  MonoBehaviour
                 Debug.LogError(k +  "   Hightest order...  " + _storedDic.ElementAt(k).Key + "  val... " + _storedDic.ElementAt(k).Value);
                 for(int n = m; n <= m; n++)
                 {
-                   HotNumber_List[n].text = _storedDic.ElementAt(k).Key; 
+                    for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
+                    {
+                        if(int.Parse(_storedDic.ElementAt(k).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
+                        {
+                            Debug.LogError("_gen... " + _GenNo);
+                            if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                            {
+                                Debug.Log("1 high.else");
+                                HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
+                            }
+                            else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
+                            {
+                                Debug.Log("2 high.else");
+                                HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
+                            }
+                            else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                            {
+                                Debug.Log("3 high.else");
+                                HotNumber_List[n].transform.parent.gameObject.SetActive(true);
+                                HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
+                            }
+                        }
+                    }
+                   HotNumber_List[n].text = _storedDic.ElementAt(k).Key;
                 }
                 m++;
                 // HotNumber_List[k].text = _storedDic.ElementAt(k).Key;
@@ -694,16 +795,53 @@ public class PayoutScript :  MonoBehaviour
         // r1.Currentbet_txt.text = UIManager.ins.symbolsign + RouletteRules.ins.NumberFormat(BettingRules.ins.potedAmound);
         r1.Currentbet_txt.text = PlayerPrefs.GetInt("CurrentBets").ToString();
         Debug.Log("Curentbets..text...  " + r1.Currentbet_txt.text);
-        r1.GeneratedNo_txt.text = _GenNo.ToString();
-        r1.Payoutpts_txt.text = PayoutPts.ToString();
         if(PayoutPts <= 0)
         {
-            r1.Payoutpts_txt.color = new Color(1.0f, 0, 0, 1.0f);           //REd color...
+            // r1.Payoutpts_txt.color = new Color(1.0f, 0, 0, 1.0f);           //REd color...
+            r1.Payoutpts_txt.color = new Color(0.75f, 0, 0.067f, 1.0f);           //REd color...
+            for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
+            {
+                if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
+                {
+                    if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
+                    }
+                    else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
+                    }
+                    else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
+                    }
+                }
+            }
         }
         else
         {
             r1.Payoutpts_txt.color = new Color(0, 0.5f, 0, 1.0f);       // Green color...
+            for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
+            {
+                if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
+                {
+                    if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
+                    }
+                    else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
+                    }
+                    else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                    {
+                        r1.GeneratedNo_txt.transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
+                    }
+                }
+            }
         }
+        r1.GeneratedNo_txt.text = _GenNo.ToString();
+        r1.Payoutpts_txt.text = PayoutPts.ToString();
        
         RollObj.GetComponent<Toggle>().group = RouletteRules.ins.RollsPanel.transform.GetChild(0).GetComponent<ToggleGroup>();
         RouletteRules.ins.RollObjNew = RollObj;
