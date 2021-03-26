@@ -40,7 +40,7 @@ public class RouletteRules : MonoBehaviour
     public void PlaceChips(GameObject ParentObj)
     {
         Debug.Log("RR.. "+ ParentObj);
-        UIManager.ins.SettingScreen.SetActive(false);
+        // UIManager.ins.SettingScreen.SetActive(false);
 
         CurrentChips = ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
 
@@ -102,7 +102,7 @@ public class RouletteRules : MonoBehaviour
                 Debug.Log("1 currentChip<=0 : " + CurrentChips);
 
             }
-            else if (CurrentChips < UIManager.ins.MinBet)
+            else if (CurrentChips < 1)       //UIManager.ins.MinBet
             {
                 ParentObj.gameObject.SetActive(false);
                 // if (ParentObj.transform.parent.GetComponent<ObjectDetails>() != null) ParentObj.transform.parent.GetComponent<ObjectDetails>().AddMyChipsValue(-CurrentChips);
@@ -121,40 +121,35 @@ public class RouletteRules : MonoBehaviour
             }
 
             UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
-            SoundManager.instance.playForOneShot(SoundManager.instance.RemoveChipsClip); // Sound for removing Chips
+            // SoundManager.instance.playForOneShot(SoundManager.instance.RemoveChipsClip); // Sound for removing Chips
         }
         //When Increasebets toggle is ON
         else
         {
             if (currrentRackValue == 0)
             {
-                msgSystem.ins.PopUpMsg.text = "YOU DO NOT HAVE ENOUGH MONEY IN YOUR RACK TO MAKE THIS BET";
-                msgSystem.ins.PopUpPnl.SetActive(true);
+                Debug.Log("YOU DO NOT HAVE ENOUGH MONEY IN YOUR RACK TO MAKE THIS BET");
+                // msgSystem.ins.PopUpMsg.text = "YOU DO NOT HAVE ENOUGH MONEY IN YOUR RACK TO MAKE THIS BET";
+                // msgSystem.ins.PopUpPnl.SetActive(true);
                 return;
             }
 
-            int CurrentPointIs = BettingRules.ins.getPlaceIndexpoint(ParentObj);
-            ObjectDetails tempOdds = UIManager.ins.TradPointObjs[CurrentPointIs].mineAllObj[7].GetComponent<ObjectDetails>();
-            UIManager.ins.MaxBet = int.Parse(UIManager.ins.PlayerPrivateTableList[UIManager.ins.CurrentTableId].max_bet);
+            // int CurrentPointIs = BettingRules.ins.getPlaceIndexpoint(ParentObj);
+            // ObjectDetails tempOdds = UIManager.ins.TradPointObjs[CurrentPointIs].mineAllObj[7].GetComponent<ObjectDetails>();
+            UIManager.ins.MaxBet = 100;
 
             float OddRack = 0; //UIManager.ins.MaxBet; //
-            float tmpMxOdds = 0;
-            int BoardValue = int.Parse(UIManager.ins.TradPointObjs[CurrentPointIs].name);
+            // float tmpMxOdds = 0;
+            // int BoardValue = int.Parse(UIManager.ins.TradPointObjs[CurrentPointIs].name);
             OddRack = UIManager.ins.MaxBet;
-            tmpMxOdds = UIManager.ins.MaxOddValue;
+            // tmpMxOdds = UIManager.ins.MaxOddValue;
 
-            // if (BettingRules.ins.TablePayOutOption == 0 && BettingRules.ins.LayPayOutOption == 1 && BettingRules.ins.BuyPayOutOption == 1)
-            // {
-            //     // ChipsValue = UIManager.ins.MinBet;
-            //     // UIManager.ins.MaxBet = int.Parse(UIManager.ins.PlayerPrivateTableList[UIManager.ins.CurrentTableId].max_bet);
-            //     OddRack = OddRack = UIManager.ins.MaxBet;
-            // }
-
-            float tmpRack = OddRack - tempOdds.myChipValue;
+            // float tmpRack = OddRack - tempOdds.myChipValue;
 
             if (currrentRackValue <= BettingRules.ChipsValue) BettingRules.ChipsValue = currrentRackValue;
-            tempOdds.AddMyChipsValue(BettingRules.ChipsValue);
-            BettingRules.ins.currentChip = tempOdds.myChipValue;
+            int _currentchipVal = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
+            // tempOdds.AddMyChipsValue(BettingRules.ChipsValue);
+            BettingRules.ins.currentChip = _currentchipVal;
             ParentObj.gameObject.SetActive(true);
             if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StraightBet")
             {
@@ -248,7 +243,7 @@ public class RouletteRules : MonoBehaviour
         {
             ParentObj.transform.GetChild(0).GetComponent<Image>().sprite = spriteEdit.ins.ChipsSprite[0];
         }
-        SoundManager.instance.playForOneShot(SoundManager.instance.AddChipsClip); // Sound for adding Chips 
+        // SoundManager.instance.playForOneShot(SoundManager.instance.AddChipsClip); // Sound for adding Chips 
 
     }
 
@@ -287,27 +282,21 @@ public class RouletteRules : MonoBehaviour
             Debug.Log(" 1  " + BettingRules.ins.CurrentChipsValue);
                 BettingRules.ins.CurrentChipsValue = 1;
                 Debug.Log(" 2  " + BettingRules.ins.CurrentChipsValue);
-                // CraplessRules.ins.CurrentChipsValue = 1;
                 break;
             case 5:
                 BettingRules.ins.CurrentChipsValue = 5;
-                // CraplessRules.ins.CurrentChipsValue = 5;
                 break;
             case 25:
                 BettingRules.ins.CurrentChipsValue = 25;
-                // CraplessRules.ins.CurrentChipsValue = 25;
                 break;
             case 100:
                 BettingRules.ins.CurrentChipsValue = 100;
-                // CraplessRules.ins.CurrentChipsValue = 100;
                 break;
             case 500:
                 BettingRules.ins.CurrentChipsValue = 500;
-                // CraplessRules.ins.CurrentChipsValue = 500;
                 break;
             case 1000:
                 BettingRules.ins.CurrentChipsValue = 1000;
-                // CraplessRules.ins.CurrentChipsValue = 1000;
                 break;
 
         }
@@ -316,6 +305,5 @@ public class RouletteRules : MonoBehaviour
         theActiveToggle.gameObject.GetComponent<UIAddons.MovingItem>().isRunning = true;
         theActiveToggle.gameObject.transform.GetChild(0).gameObject.SetActive(true);
         LastSelectedChips = theActiveToggle.gameObject;
-        SoundManager.instance.playForOneShot(SoundManager.instance.ChipsSelectionClip);
     }
 }

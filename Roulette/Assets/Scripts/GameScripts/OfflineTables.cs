@@ -18,11 +18,11 @@ public static OfflineTables ins;
     // Start is called before the first frame update
     void Start()
     {
-        if (transform.name == "Bubble")
-            PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(0));
-        else if (transform.name == "Money")
-            PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(1));
-        else if (transform.name == "Strips")
-            PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(2));
+        // if (transform.name == "Bubble")
+        //     PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(0));
+        // else if (transform.name == "Money")
+        //     PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(1));
+        // else if (transform.name == "Strips")
+        //     PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(2));
     }
 }
