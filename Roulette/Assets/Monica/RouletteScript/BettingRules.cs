@@ -46,13 +46,13 @@ public class BettingRules : MonoBehaviour
     public int CurrentBetValue()
     {
         int CurrentBetValue = int.Parse(UIManager.ins.BetsTxt.text.Replace(",", "").Replace(".00", ""));
-        Debug.LogError("CurrentBetValue... " + CurrentBetValue);
+        // Debug.LogError("CurrentBetValue... " + CurrentBetValue);
         return CurrentBetValue;
     }
     public int CurrentRackValue()
     {
         int CurrentrackValue = int.Parse(UIManager.ins.RackTxt.text.Replace(",", "").Replace(".00", ""));
-        Debug.LogError("CurrentrackValue... " + CurrentrackValue);
+        // Debug.LogError("CurrentrackValue... " + CurrentrackValue);
         return CurrentrackValue;
     }
 

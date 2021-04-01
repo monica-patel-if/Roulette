@@ -15,7 +15,12 @@ public class UIManager : MonoBehaviour
     public string symbolsign = "";//"∵";
     public CanvasBarChart myGraphStatastics;
     public string barGroupName = "group1";
-    public int MaxBet;
+    public int Inside_MaxBet;
+    public int Outside_MaxBet;
+    public int Inside_MinBetPerSpot;
+    public int Outside_MinBetPerSpot;
+    public int Inside_MaxBetPerSpot;
+    public int Outside_MaxBetPerSpot;
     
     public static UIManager ins;
     public Button PlayNowBtn;
@@ -30,8 +35,14 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         symbolsign = " ";
-        RackTxt.text = "500";
-        BankRollTxt.text = "500";
+        RackTxt.text = "2000";      //500
+        BankRollTxt.text = "2000";   //500
+        Inside_MinBetPerSpot = 1;
+        Outside_MinBetPerSpot = 200;
+        Inside_MaxBetPerSpot = 15;
+        Outside_MaxBetPerSpot = 500;
+        Inside_MaxBet = 100;
+        Outside_MaxBet = 1000;
         PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(0));
     }
     public void SetTable(int id)

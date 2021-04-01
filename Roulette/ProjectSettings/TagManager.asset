@@ -13,6 +13,7 @@ TagManager:
   - SquareBet
   - StreetBet
   - D_StreetBets
+  - InsideBet
   layers:
   - Default
   - TransparentFX

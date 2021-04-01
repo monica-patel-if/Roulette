@@ -18,4 +18,3 @@ public class ObjectDetails : MonoBehaviour
     }
 
 }
-

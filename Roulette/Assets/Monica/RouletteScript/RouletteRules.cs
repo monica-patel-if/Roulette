@@ -19,6 +19,9 @@ public class RouletteRules : MonoBehaviour
     public List<GameObject> D_StreetBets = new List<GameObject>();
     public List<GameObject> OutsideBets = new List<GameObject>();
     public GameObject RollObjNew, RollsPrefab, RollsPanel;
+    float  maxPerSpot_inside, maxPerSpot_outside, _calculate_chipVal;
+    int _selectedChip;
+    int _OutsideBets, _InsideBets;
 
     private void Awake()
     {
@@ -29,6 +32,8 @@ public class RouletteRules : MonoBehaviour
     void Start()
     {
         SelectChips();
+        // maxPerSpot_inside = UIManager.ins.Inside_MaxBetPerSpot;
+        // maxPerSpot_outside = UIManager.ins.Outside_MaxBetPerSpot;
     }
 
     // // Update is called once per frame
@@ -39,12 +44,14 @@ public class RouletteRules : MonoBehaviour
 
     public void PlaceChips(GameObject ParentObj)
     {
-        Debug.Log("RR.. "+ ParentObj);
-        // UIManager.ins.SettingScreen.SetActive(false);
+        Debug.Log("RR.. "+ ParentObj.name + "  Tag...  " + ParentObj.tag + "  _selectedChip...  " + _selectedChip);
+        BettingRules.ins.CurrentChipsValue = _selectedChip;
+        BettingRules.ChipsValue = _selectedChip;
 
         CurrentChips = ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
 
         int currrentRackValue = BettingRules.ins.CurrentRackValue();
+        Debug.LogError("currrentRackValue...  " + currrentRackValue);
         //When Decreasebets toggle is ON
         if (BettingRules.ins.RemoveBets.isOn && (BettingRules.ins.potedAmound == 0))
         {
@@ -121,100 +128,179 @@ public class RouletteRules : MonoBehaviour
             }
 
             UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
-            // SoundManager.instance.playForOneShot(SoundManager.instance.RemoveChipsClip); // Sound for removing Chips
         }
+
         //When Increasebets toggle is ON
         else
         {
+            if(ParentObj.tag == "InsideBet")
+            {
+                Debug.Log("IN...  " + BettingRules.ins.CurrentChipsValue + "   " + UIManager.ins.Inside_MinBetPerSpot);
+                if( BettingRules.ins.CurrentChipsValue < UIManager.ins.Inside_MinBetPerSpot )
+                {
+                    BettingRules.ins.CurrentChipsValue = UIManager.ins.Inside_MinBetPerSpot;
+                    BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
+                }
+            }
+            else if(ParentObj.tag == "OutsideBet")
+            {
+                Debug.Log("OUT...  " + BettingRules.ins.CurrentChipsValue + "   " + UIManager.ins.Outside_MinBetPerSpot);
+                if( BettingRules.ins.CurrentChipsValue < UIManager.ins.Outside_MinBetPerSpot )
+                {
+                    BettingRules.ins.CurrentChipsValue = UIManager.ins.Outside_MinBetPerSpot;
+                    BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
+                }
+            }
+
             if (currrentRackValue == 0)
             {
                 Debug.Log("YOU DO NOT HAVE ENOUGH MONEY IN YOUR RACK TO MAKE THIS BET");
-                // msgSystem.ins.PopUpMsg.text = "YOU DO NOT HAVE ENOUGH MONEY IN YOUR RACK TO MAKE THIS BET";
-                // msgSystem.ins.PopUpPnl.SetActive(true);
                 return;
             }
 
-            // int CurrentPointIs = BettingRules.ins.getPlaceIndexpoint(ParentObj);
-            // ObjectDetails tempOdds = UIManager.ins.TradPointObjs[CurrentPointIs].mineAllObj[7].GetComponent<ObjectDetails>();
-            UIManager.ins.MaxBet = 100;
+            float OddRack = 0;
+            if( ParentObj.tag == "InsideBet" )
+            {
+                OddRack = UIManager.ins.Inside_MaxBet;
+                if (currrentRackValue <= BettingRules.ChipsValue)
+                {
+                    BettingRules.ChipsValue = currrentRackValue;
+                    BettingRules.ins.CurrentChipsValue = currrentRackValue;
+                }
+                int _currentchipVal = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
 
-            float OddRack = 0; //UIManager.ins.MaxBet; //
-            // float tmpMxOdds = 0;
-            // int BoardValue = int.Parse(UIManager.ins.TradPointObjs[CurrentPointIs].name);
-            OddRack = UIManager.ins.MaxBet;
-            // tmpMxOdds = UIManager.ins.MaxOddValue;
+                //Check total Chips placement on outside bets
+                int _TotalInsideBets = BettingRules.ChipsValue + _InsideBets;
+                Debug.Log("_InsideBets...  " + _InsideBets + "   OddRack...   " + OddRack + "    _TotalOutsideBets...  " + _TotalInsideBets + "  " + BettingRules.ChipsValue);
 
-            // float tmpRack = OddRack - tempOdds.myChipValue;
+                float TotalMax = OddRack - _TotalInsideBets;
+                // _InsideBets = _TotalInsideBets;
+                Debug.Log("TotalMax...  " + TotalMax);
 
-            if (currrentRackValue <= BettingRules.ChipsValue) BettingRules.ChipsValue = currrentRackValue;
-            int _currentchipVal = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
-            // tempOdds.AddMyChipsValue(BettingRules.ChipsValue);
-            BettingRules.ins.currentChip = _currentchipVal;
-            ParentObj.gameObject.SetActive(true);
-            if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StraightBet")
-            {
-                if(!StraightBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                // maximum total on bets..... for inside and outside
+                if( TotalMax >= 0 )
                 {
-                    StraightBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                    _calculate_chipVal = CurrentChips + BettingRules.ins.CurrentChipsValue;
+                    Debug.Log("UIManager.ins.Inside_MaxBetPerSpot... " + UIManager.ins.Inside_MaxBetPerSpot + "   currentchips...  " + CurrentChips);
+
+                    //maximum total per spot (on individual chip) for inside bets....
+                    if( _calculate_chipVal <= UIManager.ins.Inside_MaxBetPerSpot )
+                    {
+                        _InsideBets = BettingRules.ChipsValue + _InsideBets;
+                        Debug.LogError("_InsideBets..IN.  " + _InsideBets);
+                        BettingRules.ins.currentChip = _currentchipVal;
+
+                        if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StraightBet")
+                        {
+                            if(!StraightBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                            {
+                                StraightBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            }
+                        }
+                        else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "SplitsBet")
+                        {
+                            if(!SplitsBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                            {
+                                SplitsBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            }
+                            // else
+                            // {
+                            //     SplitsBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            // }
+                        }
+                        else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "SquareBet")
+                        {
+                            if(!SquareBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                            {
+                                SquareBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            }
+                        }
+                        else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StreetBet")
+                        {
+                            if(!StreetBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                            {
+                                StreetBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            }
+                        }
+                        else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "D_StreetBets")
+                        {
+                            if(!D_StreetBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                            {
+                                D_StreetBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                            }
+                        }
+
+                        ParentObj.gameObject.SetActive(true);
+                        ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat( CurrentChips + BettingRules.ins.CurrentChipsValue);
+                        CurrentChips = int.Parse( ParentObj.transform.GetChild(1).GetComponent<Text>().text);
+                        ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = CurrentChips;
+                
+                        BettingRules.ins.potedAmound = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
+                        UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
+                        // PlayerPrefs.SetInt("CurrentBets", BettingRules.ins.potedAmound);
+                        UIManager.ins.RackTxt.text = UIManager.ins.symbolsign + NumberFormat(currrentRackValue - BettingRules.ChipsValue);
+                        BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("YOU REACHED MAXIMUM BETS...");
                 }
             }
-            else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "SplitsBet")
+            else if( ParentObj.tag == "OutsideBet" )
             {
-                if(!SplitsBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                OddRack = UIManager.ins.Outside_MaxBet;
+                if (currrentRackValue <= BettingRules.ChipsValue) 
                 {
-                    SplitsBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                    Debug.LogError("currrentRackValue...if..  " + currrentRackValue);
+                    BettingRules.ChipsValue = currrentRackValue;
+                    BettingRules.ins.CurrentChipsValue = currrentRackValue;
                 }
-                // else
-                // {
-                //     SplitsBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
-                // }
-            }
-            else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "SquareBet")
-            {
-                if(!SquareBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                int _currentchipVal = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
+                Debug.Log("_currentchipVal...  " + _currentchipVal);
+                
+                //Check total Chips placement on outside bets
+                int _TotalOutsideBets = BettingRules.ChipsValue + _OutsideBets;
+                Debug.Log("_OutsideBets...  " + _OutsideBets + "   OddRack...   " + OddRack + "    _TotalOutsideBets...  " + _TotalOutsideBets + "   2.. " + BettingRules.ChipsValue);
+
+                float TotalMax = OddRack - _TotalOutsideBets;
+                // _OutsideBets = _TotalOutsideBets;
+                Debug.Log("TotalMax...  " + TotalMax);
+
+                // maximum total on bets..... for inside and outside
+                if( TotalMax >= 0 )
                 {
-                    SquareBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                    _calculate_chipVal = CurrentChips + BettingRules.ins.CurrentChipsValue;
+                    Debug.Log("UIManager.ins.Outside_MaxBetPerSpot... " + UIManager.ins.Outside_MaxBetPerSpot + "   currentchips...  " + CurrentChips);
+
+                    //maximum total per spot (on individual chip) for inside bets....
+                    if( _calculate_chipVal <= UIManager.ins.Outside_MaxBetPerSpot )
+                    {
+                        _OutsideBets = BettingRules.ChipsValue + _OutsideBets;
+                        BettingRules.ins.currentChip = _currentchipVal;
+                        if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "OutsideBet")
+                        {
+                            ParentObj.GetComponent<Toggle>().isOn = true; 
+                        }
+
+                        ParentObj.gameObject.SetActive(true);
+                        ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat( CurrentChips + BettingRules.ins.CurrentChipsValue);
+                        CurrentChips = int.Parse( ParentObj.transform.GetChild(1).GetComponent<Text>().text);
+                        ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = CurrentChips;
+                
+                        BettingRules.ins.potedAmound = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
+                        UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
+                        // PlayerPrefs.SetInt("CurrentBets", BettingRules.ins.potedAmound);
+                        UIManager.ins.RackTxt.text = UIManager.ins.symbolsign + NumberFormat(currrentRackValue - BettingRules.ChipsValue);
+                        BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
+                    }
                 }
-            }
-            else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StreetBet")
-            {
-                if(!StreetBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
+                else
                 {
-                    StreetBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
+                    Debug.LogError("YOU REACHED MAXIMUM BETS...");
                 }
-            }
-            else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "D_StreetBets")
-            {
-                if(!D_StreetBets.Contains(ParentObj.GetComponent<ChipsOnTable>().RefObj))
-                {
-                    D_StreetBets.Add(ParentObj.GetComponent<ChipsOnTable>().RefObj);
-                }
-            }
-            else if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "OutsideBet")
-            {
-                ParentObj.GetComponent<Toggle>().isOn = true; 
             }
 
-            // ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat(BettingRules.ins.currentChip);
-            ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat( CurrentChips + BettingRules.ins.CurrentChipsValue);
-            CurrentChips = int.Parse( ParentObj.transform.GetChild(1).GetComponent<Text>().text);
-            ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = CurrentChips;
-            // if (BettingRules.ins.puckToggle.isOn)
-            // {
-            //     tempOdds.OffChipsObj.SetActive(false);
-            //     tempOdds.OffChipsObj.GetComponent<Toggle>().isOn = true;
-            // }
-            // else
-            // {
-            //     tempOdds.OffChipsObj.SetActive(true);
-            //     tempOdds.OffChipsObj.GetComponent<Toggle>().isOn = true;
-            // }
-    
-            BettingRules.ins.potedAmound = BettingRules.ChipsValue + BettingRules.ins.CurrentBetValue();
-            UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
-            // PlayerPrefs.SetInt("CurrentBets", BettingRules.ins.potedAmound);
-            UIManager.ins.RackTxt.text = UIManager.ins.symbolsign + NumberFormat(currrentRackValue - BettingRules.ChipsValue);
-            BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
         }
 
 
@@ -243,7 +329,6 @@ public class RouletteRules : MonoBehaviour
         {
             ParentObj.transform.GetChild(0).GetComponent<Image>().sprite = spriteEdit.ins.ChipsSprite[0];
         }
-        // SoundManager.instance.playForOneShot(SoundManager.instance.AddChipsClip); // Sound for adding Chips 
 
     }
 
@@ -301,6 +386,7 @@ public class RouletteRules : MonoBehaviour
 
         }
         BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
+        _selectedChip = BettingRules.ins.CurrentChipsValue;
         theActiveToggle.gameObject.GetComponent<UIAddons.MovingItem>().targetCoordinates = new Vector2(0, 15);
         theActiveToggle.gameObject.GetComponent<UIAddons.MovingItem>().isRunning = true;
         theActiveToggle.gameObject.transform.GetChild(0).gameObject.SetActive(true);

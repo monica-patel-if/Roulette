@@ -820,6 +820,7 @@ public class PayoutScript :  MonoBehaviour
                     }
                 }
             }
+            r1.Payoutpts_txt.text = PayoutPts.ToString();
         }
         else
         {
@@ -842,9 +843,9 @@ public class PayoutScript :  MonoBehaviour
                     }
                 }
             }
+            r1.Payoutpts_txt.text = "+ " +  PayoutPts.ToString();
         }
         r1.GeneratedNo_txt.text = _GenNo.ToString();
-        r1.Payoutpts_txt.text = PayoutPts.ToString();
        
         RollObj.GetComponent<Toggle>().group = RouletteRules.ins.RollsPanel.transform.GetChild(0).GetComponent<ToggleGroup>();
         RouletteRules.ins.RollObjNew = RollObj;
