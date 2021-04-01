@@ -23,13 +23,6 @@ public class PayoutScript :  MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // string ValString = "(0-1-2)StreetBet";
-        // int _splitVal;
-        // string[] _bracesString_1 = ValString.Split(char.Parse(")"));
-        // Debug.Log("val 1.... " + _bracesString_1[0]);
-        // string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-        // string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-        // Debug.LogError("Val 2... " + _finalSplit[0] + "    " + _finalSplit[1] + "  " + _finalSplit[2]);
         for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
         {
             _graphVal.Add(RouletteRules.ins.Manual_StraightBets[i].name, 0);
@@ -43,7 +36,54 @@ public class PayoutScript :  MonoBehaviour
 
     public void PayoutRoulette()
     {
-        Debug.Log("CB... " + UIManager.ins.BetsTxt.text);
+        Debug.Log("CB... " + UIManager.ins.BetsTxt.text + "  TIB...  " + RouletteRules._TotalInsideBets + "  TOB... " + RouletteRules._TotalOutsideBets);
+        if( RouletteRules._TotalInsideBets < UIManager.ins.Inside_TMinBet )
+        {
+            for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
+            {
+                RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+            }
+            RouletteRules.ins.StraightBets.Clear();
+            for(int i = 0; i < RouletteRules.ins.SplitsBets.Count; i++)
+            {
+                RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+            }
+            RouletteRules.ins.SplitsBets.Clear();
+            for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
+            {
+                RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+            }
+            RouletteRules.ins.SquareBets.Clear();
+            for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
+            {
+                RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+            }
+            RouletteRules.ins.StreetBets.Clear();
+            for(int i = 0; i < RouletteRules.ins.D_StreetBets.Count; i++)
+            {
+                RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+            }
+            RouletteRules.ins.D_StreetBets.Clear();
+        }
+        if( RouletteRules._TotalOutsideBets < UIManager.ins.Outside_TMinBet )
+        {
+            for(int i = 0; i < RouletteRules.ins.OutsideBets.Count; i++)
+            {
+                if(RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn)
+                {
+                    RouletteRules.ins.OutsideBets[i].SetActive(false);
+                    RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                    RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                }
+            }
+        }
+
+
         PlayerPrefs.SetInt("CurrentBets", int.Parse(UIManager.ins.BetsTxt.text));
         _BetsTxt.text = "No More Bets";
         NomoreBetsPanel.SetActive(true);
@@ -56,228 +96,234 @@ public class PayoutScript :  MonoBehaviour
         Debug.LogError("_GenNo... " + _GenNo);
 
         //Gain payout on Right bets...
-        for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
+        if( RouletteRules._TotalInsideBets >= UIManager.ins.Inside_TMinBet )
         {
-            if( _GenNo == int.Parse(RouletteRules.ins.StraightBets[i].name) )
+            for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
             {
-                // PayoutPts += 36;
-                PayoutPts = PayoutPts + (RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue * 35);
-                RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                Debug.LogError("Payout...1...straight... " + PayoutPts);
+                if( _GenNo == int.Parse(RouletteRules.ins.StraightBets[i].name) )
+                {
+                    // PayoutPts += 36;
+                    PayoutPts = PayoutPts + (RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue * 35);
+                    RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
+                    Debug.LogError("Payout...1...straight... " + PayoutPts);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.SplitsBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2;
-            string[] _bracesString_1 = RouletteRules.ins.SplitsBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            Debug.LogError("Val 2... " + _finalSplit[0] + "    " + _finalSplit[1]);
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 )
+            for(int i = 0; i < RouletteRules.ins.SplitsBets.Count; i++)
             {
-                PayoutPts = PayoutPts + RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue * 17;
-                RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                Debug.LogError("Payout...2...split... " + PayoutPts);
+                int _splitVal_1, _splitVal_2;
+                string[] _bracesString_1 = RouletteRules.ins.SplitsBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                Debug.LogError("Val 2... " + _finalSplit[0] + "    " + _finalSplit[1]);
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 )
+                {
+                    PayoutPts = PayoutPts + RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue * 17;
+                    RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
+                    Debug.LogError("Payout...2...split... " + PayoutPts);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2, _splitVal_3, _splitVal_4;
-            string[] _bracesString_1 = RouletteRules.ins.SquareBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            _splitVal_3 = int.Parse(_finalSplit[2]);
-            _splitVal_4 = int.Parse(_finalSplit[3]);
-            if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 || _GenNo == _splitVal_3 || _GenNo == _splitVal_4 )
+            for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
             {
-                PayoutPts = PayoutPts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue * 8;
-                RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                Debug.LogError("Payout..corner.. " + PayoutPts);
+                int _splitVal_1, _splitVal_2, _splitVal_3, _splitVal_4;
+                string[] _bracesString_1 = RouletteRules.ins.SquareBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                _splitVal_3 = int.Parse(_finalSplit[2]);
+                _splitVal_4 = int.Parse(_finalSplit[3]);
+                if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 || _GenNo == _splitVal_3 || _GenNo == _splitVal_4 )
+                {
+                    PayoutPts = PayoutPts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue * 8;
+                    RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
+                    Debug.LogError("Payout..corner.. " + PayoutPts);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2, _splitVal_3;
-            string[] _bracesString_1 = RouletteRules.ins.StreetBets[i].name.Split(char.Parse(")"));
-            Debug.Log("val 1.... " + _bracesString_1[0]);
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            _splitVal_3 = int.Parse(_finalSplit[2]);
-            if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 || _GenNo == _splitVal_3 )
+            for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
             {
-                PayoutPts = PayoutPts + RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue * 11;
-                RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                Debug.LogError("Payout...Street... " + PayoutPts);
+                int _splitVal_1, _splitVal_2, _splitVal_3;
+                string[] _bracesString_1 = RouletteRules.ins.StreetBets[i].name.Split(char.Parse(")"));
+                Debug.Log("val 1.... " + _bracesString_1[0]);
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                _splitVal_3 = int.Parse(_finalSplit[2]);
+                if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 || _GenNo == _splitVal_3 )
+                {
+                    PayoutPts = PayoutPts + RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue * 11;
+                    RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
+                    Debug.LogError("Payout...Street... " + PayoutPts);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.D_StreetBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2;
-            string[] _bracesString_1 = RouletteRules.ins.D_StreetBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == true )
+            for(int i = 0; i < RouletteRules.ins.D_StreetBets.Count; i++)
             {
-                PayoutPts = PayoutPts + RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue * 5;
-                RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                Debug.LogError("Payouts...D_street.. " + PayoutPts);
+                int _splitVal_1, _splitVal_2;
+                string[] _bracesString_1 = RouletteRules.ins.D_StreetBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == true )
+                {
+                    PayoutPts = PayoutPts + RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue * 5;
+                    RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
+                    Debug.LogError("Payouts...D_street.. " + PayoutPts);
+                }
             }
         }
 
-        for(int i = 0; i < RouletteRules.ins.OutsideBets.Count; i++)
+        if( RouletteRules._TotalOutsideBets >= UIManager.ins.Outside_TMinBet )
         {
-            if(RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn)
+            for(int i = 0; i < RouletteRules.ins.OutsideBets.Count; i++)
             {
-                if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col1" )
+                if(RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn)
                 {
-                    int next = ColVal[0];
-                    int val;
-                    for(int j = 0; j < 12; j++)
+                    if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col1" )
                     {
-                        val = next;
-                        if( _GenNo == val )
+                        int next = ColVal[0];
+                        int val;
+                        for(int j = 0; j < 12; j++)
                         {
-                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                            RouletteRules.ins.OutsideBets[i].SetActive(true);
-                            Debug.LogError("Payout...2:1_col1... " + PayoutPts);
-                            break;
-                        }
-                        next = val + 3;
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col2" )
-                {
-                    int next = ColVal[1];
-                    int val;
-                    for(int j = 0; j < 12; j++)
-                    {
-                        val = next;
-                        if( _GenNo == val )
-                        {
-                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                            RouletteRules.ins.OutsideBets[i].SetActive(true);
-                            Debug.LogError("Payout...2:1_col2... " + PayoutPts);
-                            break;
-                        }
-                        next = val + 3;
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col3" )
-                {
-                    int next = ColVal[2];
-                    int val;
-                    for(int j = 0; j < 12; j++)
-                    {
-                        val = next;
-                        if( _GenNo == val )
-                        {
-                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                            RouletteRules.ins.OutsideBets[i].SetActive(true);
-                            Debug.LogError("Payout...2:1_col3... " + PayoutPts);
-                            break;
-                        }
-                        next = val + 3;
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1st 12" )
-                {
-                    if(IsBetween(_GenNo, 1, 12) == true)
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...6..1st12. " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2nd 12" )
-                {
-                    if(IsBetween(_GenNo, 13, 24) == true)
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...7...2nd12.. " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "3rd 12" )
-                {
-                    if(IsBetween(_GenNo, 25, 36) == true)
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...8...3rd12.. " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1-18")
-                {
-                    if(IsBetween(_GenNo, 1, 18) == true)
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...9... " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "19-36" )
-                {
-                    if(IsBetween(_GenNo, 19, 36) == true)
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...10... " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Even" )
-                {
-                    if( (_GenNo % 2 ) == 0 )
-                    {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...11...plus.. " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Red" )
-                {
-                    for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
-                    {
-                        if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
-                        {
-                            if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                            val = next;
+                            if( _GenNo == val )
                             {
-                                PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                                PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
                                 RouletteRules.ins.OutsideBets[i].SetActive(true);
-                                Debug.LogError("Payout...12...plus.. " + PayoutPts);
+                                Debug.LogError("Payout...2:1_col1... " + PayoutPts);
+                                break;
+                            }
+                            next = val + 3;
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col2" )
+                    {
+                        int next = ColVal[1];
+                        int val;
+                        for(int j = 0; j < 12; j++)
+                        {
+                            val = next;
+                            if( _GenNo == val )
+                            {
+                                PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
+                                RouletteRules.ins.OutsideBets[i].SetActive(true);
+                                Debug.LogError("Payout...2:1_col2... " + PayoutPts);
+                                break;
+                            }
+                            next = val + 3;
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col3" )
+                    {
+                        int next = ColVal[2];
+                        int val;
+                        for(int j = 0; j < 12; j++)
+                        {
+                            val = next;
+                            if( _GenNo == val )
+                            {
+                                PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
+                                RouletteRules.ins.OutsideBets[i].SetActive(true);
+                                Debug.LogError("Payout...2:1_col3... " + PayoutPts);
+                                break;
+                            }
+                            next = val + 3;
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1st 12" )
+                    {
+                        if(IsBetween(_GenNo, 1, 12) == true)
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...6..1st12. " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2nd 12" )
+                    {
+                        if(IsBetween(_GenNo, 13, 24) == true)
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...7...2nd12.. " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "3rd 12" )
+                    {
+                        if(IsBetween(_GenNo, 25, 36) == true)
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 2;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...8...3rd12.. " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1-18")
+                    {
+                        if(IsBetween(_GenNo, 1, 18) == true)
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...9... " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "19-36" )
+                    {
+                        if(IsBetween(_GenNo, 19, 36) == true)
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...10... " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Even" )
+                    {
+                        if( (_GenNo % 2 ) == 0 )
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...11...plus.. " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Red" )
+                    {
+                        for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
+                        {
+                            if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
+                            {
+                                if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
+                                {
+                                    PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                                    RouletteRules.ins.OutsideBets[i].SetActive(true);
+                                    Debug.LogError("Payout...12...plus.. " + PayoutPts);
+                                }
                             }
                         }
                     }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Black" )
-                {
-                    for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Black" )
                     {
-                        if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
+                        for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
                         {
-                            if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                            if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
                             {
-                                PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
-                                RouletteRules.ins.OutsideBets[i].SetActive(true);
-                                Debug.LogError("Payout...13...plus.. " + PayoutPts);
+                                if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
+                                {
+                                    PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                                    RouletteRules.ins.OutsideBets[i].SetActive(true);
+                                    Debug.LogError("Payout...13...plus.. " + PayoutPts);
+                                }
                             }
                         }
                     }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Odd" )
-                {
-                    if( (_GenNo % 2 ) != 0 )
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Odd" )
                     {
-                        PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
-                        RouletteRules.ins.OutsideBets[i].SetActive(true);
-                        Debug.LogError("Payout...14...plus.. " + PayoutPts);
+                        if( (_GenNo % 2 ) != 0 )
+                        {
+                            PayoutPts = PayoutPts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue * 1;
+                            RouletteRules.ins.OutsideBets[i].SetActive(true);
+                            Debug.LogError("Payout...14...plus.. " + PayoutPts);
+                        }
                     }
                 }
             }
@@ -285,281 +331,311 @@ public class PayoutScript :  MonoBehaviour
 
 
         //Lose payout on wrong bets...
-        for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
+        if( RouletteRules._TotalInsideBets >= UIManager.ins.Inside_TMinBet )
         {
-            if( _GenNo != int.Parse(RouletteRules.ins.StraightBets[i].name) )
+            for(int i = RouletteRules.ins.StraightBets.Count - 1; i >=0; i--)                  //for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
             {
-                // PayoutPts += 36;
-                Debug.LogError("Payout...straight..1..minus  " + PayoutPts);
-                PayoutPts = PayoutPts - RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
-                _losePayouts = _losePayouts + RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
-                Debug.LogError("Payout...straight...2..minus  " + PayoutPts);
+                Debug.Log("Count...   " + RouletteRules.ins.StraightBets.Count);
+                if( _GenNo != int.Parse(RouletteRules.ins.StraightBets[i].name) )
+                {
+                    // PayoutPts += 36;
+                    Debug.LogError("_GenNo.straight.1.minus  " + _GenNo + "  i...  " + i + "   name...   " + RouletteRules.ins.StraightBets[i].name);
+                    PayoutPts = PayoutPts - RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules._TotalInsideBets = RouletteRules._TotalInsideBets - RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                    _losePayouts = _losePayouts + RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.StraightBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                    RouletteRules.ins.StraightBets.RemoveAt(i);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.SplitsBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2;
-            string[] _bracesString_1 = RouletteRules.ins.SplitsBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));            
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            Debug.LogError("Val 2..splits. " + _splitVal_1 + "    " + _splitVal_2);
-            if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 )
+            for(int i = RouletteRules.ins.SplitsBets.Count - 1; i >= 0; i--)             //for(int i = 0; i < RouletteRules.ins.SplitsBets.Count; i++)
             {
-                Debug.LogError("Splits bets dispear");
-                PayoutPts = PayoutPts - RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
-                _losePayouts = _losePayouts + RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                int _splitVal_1, _splitVal_2;   // 1417
+                string[] _bracesString_1 = RouletteRules.ins.SplitsBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                Debug.LogError("Val 2..splits. " + _splitVal_1 + "    " + _splitVal_2);
+                if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 )
+                {
+                    Debug.LogError("Splits bets dispear");
+                    PayoutPts = PayoutPts - RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules._TotalInsideBets = RouletteRules._TotalInsideBets - RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                    _losePayouts = _losePayouts + RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                    RouletteRules.ins.SplitsBets.RemoveAt(i);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2, _splitVal_3, _splitVal_4;
-            string[] _bracesString_1 = RouletteRules.ins.SquareBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            _splitVal_3 = int.Parse(_finalSplit[2]);
-            _splitVal_4 = int.Parse(_finalSplit[3]);
-            if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 && _GenNo != _splitVal_3 && _GenNo != _splitVal_4 )
+            for(int i = RouletteRules.ins.SquareBets.Count - 1; i >= 0; i--)             //for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
             {
-                PayoutPts = PayoutPts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
-                _losePayouts = _losePayouts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
-                Debug.LogError("Payout..corner...minus " + PayoutPts);
+                int _splitVal_1, _splitVal_2, _splitVal_3, _splitVal_4;
+                string[] _bracesString_1 = RouletteRules.ins.SquareBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                _splitVal_3 = int.Parse(_finalSplit[2]);
+                _splitVal_4 = int.Parse(_finalSplit[3]);
+                if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 && _GenNo != _splitVal_3 && _GenNo != _splitVal_4 )
+                {
+                    PayoutPts = PayoutPts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules._TotalInsideBets = RouletteRules._TotalInsideBets - RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                    _losePayouts = _losePayouts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                    Debug.LogError("Payout..corner...minus " + PayoutPts);
+                    RouletteRules.ins.SquareBets.RemoveAt(i);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2, _splitVal_3;
-            string[] _bracesString_1 = RouletteRules.ins.StreetBets[i].name.Split(char.Parse(")"));
-            Debug.Log("val 1.... " + _bracesString_1[0]);
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            _splitVal_3 = int.Parse(_finalSplit[2]);
-            if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 && _GenNo != _splitVal_3 )
+            for(int i = RouletteRules.ins.StreetBets.Count - 1; i >= 0; i--)         //for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
             {
-                PayoutPts = PayoutPts - RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
-                _losePayouts = _losePayouts + RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
-                Debug.LogError("Payout...Street... " + PayoutPts);
+                int _splitVal_1, _splitVal_2, _splitVal_3;
+                string[] _bracesString_1 = RouletteRules.ins.StreetBets[i].name.Split(char.Parse(")"));
+                Debug.Log("val 1.... " + _bracesString_1[0]);
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                _splitVal_3 = int.Parse(_finalSplit[2]);
+                if( _GenNo != _splitVal_1 && _GenNo != _splitVal_2 && _GenNo != _splitVal_3 )
+                {
+                    PayoutPts = PayoutPts - RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules._TotalInsideBets = RouletteRules._TotalInsideBets - RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                    _losePayouts = _losePayouts + RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                    Debug.LogError("Payout...Street... " + PayoutPts);
+                    RouletteRules.ins.StreetBets.RemoveAt(i);
+                }
             }
-        }
-        for(int i = 0; i < RouletteRules.ins.D_StreetBets.Count; i++)
-        {
-            int _splitVal_1, _splitVal_2;
-            string[] _bracesString_1 = RouletteRules.ins.D_StreetBets[i].name.Split(char.Parse(")"));
-            string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
-            string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-            _splitVal_1 = int.Parse(_finalSplit[0]);
-            _splitVal_2 = int.Parse(_finalSplit[1]);
-            if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == false )
+            for(int i = RouletteRules.ins.D_StreetBets.Count - 1; i >= 0; i--)           //for(int i = 0; i < RouletteRules.ins.D_StreetBets.Count; i++)
             {
-                PayoutPts = PayoutPts - RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
-                _losePayouts = _losePayouts + RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
-                RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                int _splitVal_1, _splitVal_2;
+                string[] _bracesString_1 = RouletteRules.ins.D_StreetBets[i].name.Split(char.Parse(")"));
+                string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
+                string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
+                _splitVal_1 = int.Parse(_finalSplit[0]);
+                _splitVal_2 = int.Parse(_finalSplit[1]);
+                if( IsBetween(_GenNo, _splitVal_1, _splitVal_2) == false )
+                {
+                    PayoutPts = PayoutPts - RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules._TotalInsideBets = RouletteRules._TotalInsideBets - RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(false);
+                    _losePayouts = _losePayouts + RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue;
+                    RouletteRules.ins.D_StreetBets[i].GetComponent<ObjectDetails>().myChipValue = 0;
+                    RouletteRules.ins.D_StreetBets.RemoveAt(i);
+                }
             }
         }
 
-        for(int i = 0; i < RouletteRules.ins.OutsideBets.Count; i++)
+        if( RouletteRules._TotalOutsideBets >= UIManager.ins.Outside_TMinBet )
         {
-            if(RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn)
+            for(int i = 0; i < RouletteRules.ins.OutsideBets.Count; i++)
             {
-                if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col1" )
+                if(RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn)
                 {
-                    StoreColVal.Clear();
-                    int next = ColVal[0];
-                    int val;
-                    for(int j = 0; j < 12; j++)
+                    if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col1" )
                     {
-                        val = next;
-                        StoreColVal.Add(val);
-                        next = val + 3;
-                    }
-                    if( !StoreColVal.Contains(_GenNo) )
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...3...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col2" )
-                {
-                    StoreColVal.Clear();
-                    int next = ColVal[1];
-                    int val;
-                    for(int j = 0; j < 12; j++)
-                    {
-                        val = next;
-                        StoreColVal.Add(val);
-                        next = val + 3;
-                    }
-                    if( !StoreColVal.Contains(_GenNo) )
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...4...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col3" )
-                {
-                    StoreColVal.Clear();
-                    int next = ColVal[2];
-                    int val;
-                    for(int j = 0; j < 12; j++)
-                    {
-                        val = next;
-                        StoreColVal.Add(val);
-                        next = val + 3;
-                    }
-                    if( !StoreColVal.Contains(_GenNo) )
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...5...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1st 12" )
-                {
-                    if(IsBetween(_GenNo, 1, 12) == false)
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...6...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2nd 12" )
-                {
-                    if(IsBetween(_GenNo, 13, 24) == false)
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...7...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "3rd 12" )
-                {
-                    if(IsBetween(_GenNo, 25, 36) == false)
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...8...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1-18")
-                {
-                    if(IsBetween(_GenNo, 1, 18) == false)
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...9...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "19-36" )
-                {
-                    if(IsBetween(_GenNo, 19, 36) == false)
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue; 
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...10...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Even" )
-                {
-                    if( (_GenNo % 2 ) != 0 )
-                    {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...11...minus " + PayoutPts);
-                    }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Red" )
-                {
-                    for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
-                    {
-                        if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
+                        StoreColVal.Clear();
+                        int next = ColVal[0];
+                        int val;
+                        for(int j = 0; j < 12; j++)
                         {
-                            if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty != "Red" )
+                            val = next;
+                            StoreColVal.Add(val);
+                            next = val + 3;
+                        }
+                        if( !StoreColVal.Contains(_GenNo) )
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...3...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col2" )
+                    {
+                        StoreColVal.Clear();
+                        int next = ColVal[1];
+                        int val;
+                        for(int j = 0; j < 12; j++)
+                        {
+                            val = next;
+                            StoreColVal.Add(val);
+                            next = val + 3;
+                        }
+                        if( !StoreColVal.Contains(_GenNo) )
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...4...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2:1_col3" )
+                    {
+                        StoreColVal.Clear();
+                        int next = ColVal[2];
+                        int val;
+                        for(int j = 0; j < 12; j++)
+                        {
+                            val = next;
+                            StoreColVal.Add(val);
+                            next = val + 3;
+                        }
+                        if( !StoreColVal.Contains(_GenNo) )
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...5...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1st 12" )
+                    {
+                        if(IsBetween(_GenNo, 1, 12) == false)
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...6...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "2nd 12" )
+                    {
+                        if(IsBetween(_GenNo, 13, 24) == false)
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...7...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "3rd 12" )
+                    {
+                        if(IsBetween(_GenNo, 25, 36) == false)
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...8...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "1-18")
+                    {
+                        if(IsBetween(_GenNo, 1, 18) == false)
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...9...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "19-36" )
+                    {
+                        if(IsBetween(_GenNo, 19, 36) == false)
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue; 
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...10...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Even" )
+                    {
+                        if( (_GenNo % 2 ) != 0 )
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...11...minus " + PayoutPts);
+                        }
+                    }
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Red" )
+                    {
+                        for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
+                        {
+                            if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
                             {
-                                PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                                RouletteRules.ins.OutsideBets[i].SetActive(false);
-                                _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                                RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                                RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                                Debug.LogError("Payout...12...minus " + PayoutPts);
+                                if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty != "Red" )
+                                {
+                                    PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules.ins.OutsideBets[i].SetActive(false);
+                                    _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                                    RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                                    Debug.LogError("Payout...12...minus " + PayoutPts);
+                                }
                             }
                         }
                     }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Black" )
-                {
-                    for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Black" )
                     {
-                        if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
+                        for(int j = 0; j < RouletteRules.ins.Manual_StraightBets.Count; j++)
                         {
-                            if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty != "Black" )
+                            if( _GenNo == int.Parse(RouletteRules.ins.Manual_StraightBets[j].name) )
                             {
-                                PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                                RouletteRules.ins.OutsideBets[i].SetActive(false);
-                                _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                                RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                                RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                                Debug.LogError("Payout...12...minus " + PayoutPts);
+                                if( RouletteRules.ins.Manual_StraightBets[j].GetComponent<ObjectDetails>()._chipColorPty != "Black" )
+                                {
+                                    PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules.ins.OutsideBets[i].SetActive(false);
+                                    _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                                    RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                                    RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                                    Debug.LogError("Payout...12...minus " + PayoutPts);
+                                }
                             }
                         }
                     }
-                }
-                else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Odd" )
-                {
-                    if( (_GenNo % 2 ) == 0 )
+                    else if( RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.name == "Odd" )
                     {
-                        PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].SetActive(false);
-                        _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
-                        RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
-                        Debug.LogError("Payout...13...minus " + PayoutPts);
+                        if( (_GenNo % 2 ) == 0 )
+                        {
+                            PayoutPts = PayoutPts - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].SetActive(false);
+                            _losePayouts = _losePayouts + RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules._TotalOutsideBets = RouletteRules._TotalOutsideBets - RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = 0;
+                            RouletteRules.ins.OutsideBets[i].GetComponent<Toggle>().isOn = false;
+                            Debug.LogError("Payout...13...minus " + PayoutPts);
+                        }
                     }
                 }
             }
         }
+
+
         string _unremovedStr = UIManager.ins.RackTxt.text;
         Debug.Log("_unremovedStr...  " + _unremovedStr);
         int pos = _unremovedStr.IndexOf(",");
