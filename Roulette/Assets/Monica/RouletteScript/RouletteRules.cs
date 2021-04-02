@@ -33,8 +33,6 @@ public class RouletteRules : MonoBehaviour
     void Start()
     {
         SelectChips();
-        // maxPerSpot_inside = UIManager.ins.Inside_MaxBetPerSpot;
-        // maxPerSpot_outside = UIManager.ins.Outside_MaxBetPerSpot;
     }
 
     // // Update is called once per frame
@@ -75,11 +73,9 @@ public class RouletteRules : MonoBehaviour
                 UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
                 UIManager.ins.RackTxt.text = UIManager.ins.symbolsign + NumberFormat((currrentRackValue + BettingRules.ins.CurrentChipsValue));
 
-                Debug.Log("called from here 1 currentChip: " + BettingRules.ins.CurrentChipsValue + "   potedAmound... " + BettingRules.ins.potedAmound + "  SS... " + currrentRackValue);
             }
             else if (CurrentChips <= BettingRules.ins.CurrentChipsValue)
             {
-                Debug.LogError("CC... " + CurrentChips);
                 BettingRules.ins.potedAmound = BettingRules.ins.CurrentBetValue() - CurrentChips;
 
                 UIManager.ins.BetsTxt.text = UIManager.ins.symbolsign + NumberFormat(BettingRules.ins.potedAmound);
@@ -87,7 +83,6 @@ public class RouletteRules : MonoBehaviour
                 ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat( CurrentChips - BettingRules.ins.CurrentChipsValue );
                 CurrentChips = int.Parse( ParentObj.transform.GetChild(1).GetComponent<Text>().text);
                 ParentObj.GetComponent<ChipsOnTable>().RefObj.GetComponent<ObjectDetails>().myChipValue = CurrentChips;
-                Debug.Log("called from here 2 currentChip : " + CurrentChips + "   Rackvalue.... " + currrentRackValue);
             }
 
             // if (ParentObj.transform.parent.GetComponent<ObjectDetails>() != null) ParentObj.transform.parent.GetComponent<ObjectDetails>().AddMyChipsValue(-BettingRules.ins.CurrentChipsValue);
@@ -110,15 +105,11 @@ public class RouletteRules : MonoBehaviour
                     ParentObj.GetComponent<Toggle>().isOn = false;
                 }
 
-                Debug.Log("1 currentChip<=0 : " + CurrentChips);
 
             }
             else if (CurrentChips < 1)       //UIManager.ins.MinBet
             {
                 ParentObj.gameObject.SetActive(false);
-                // if (ParentObj.transform.parent.GetComponent<ObjectDetails>() != null) ParentObj.transform.parent.GetComponent<ObjectDetails>().AddMyChipsValue(-CurrentChips);
-
-                Debug.Log("3 currentChip < UIManager.ins.MinBet : " + CurrentChips);
                 currrentRackValue = BettingRules.ins.CurrentRackValue(); //int.Parse(UIManager.ins.RackTxt.text.Replace(UIManager.ins.symbolsign, "").Replace(",", ""));
 
                 BettingRules.ins.potedAmound = BettingRules.ins.CurrentBetValue() - CurrentChips;
@@ -131,7 +122,6 @@ public class RouletteRules : MonoBehaviour
             }
             else 
             {
-                Debug.LogError("else called... ");
                 ParentObj.transform.GetChild(1).GetComponent<Text>().text = NumberFormat(CurrentChips);
             }
 
@@ -176,11 +166,9 @@ public class RouletteRules : MonoBehaviour
                 //maximum total per spot (on individual chip) for inside bets....
                 _calculate_chipVal = CurrentChips + BettingRules.ins.CurrentChipsValue;
                 _InsideBets = CurrentChips;
-                // Debug.Log("_calculate_chipVal...  " + _calculate_chipVal + "  _currentchipVal... " + _currentchipVal + "  _InsideBets... " + _InsideBets);
                 if( _calculate_chipVal <= MaxPerSpot )
                 {
                     BettingRules.ins.currentChip = _currentchipVal;
-                    // Debug.Log("_currentchipVal...  " + _currentchipVal + "  _InsideBets... " + _InsideBets);
 
                     if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StraightBet")
                     {
@@ -238,23 +226,17 @@ public class RouletteRules : MonoBehaviour
                     BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
                     if(ParentObj.tag == "InsideBet")
                     {
-                        Debug.LogError("_TotalInsideBets... " + _TotalInsideBets);
                         _TotalInsideBets = _TotalInsideBets + BettingRules.ChipsValue;
-                        Debug.Log("CurrentChips...  " + BettingRules.ChipsValue + "  _TotalInsideBets...  " + _TotalInsideBets);
                     }
                     else if(ParentObj.tag == "OutsideBet")
                     {
-                        Debug.LogError("_TotalOutsideBets....  " + _TotalOutsideBets);
                         _TotalOutsideBets = _TotalOutsideBets + BettingRules.ChipsValue;
-                        Debug.Log("CurrentChips...  " + BettingRules.ChipsValue + "  _TotalOutsideBets...  " + _TotalOutsideBets);
                     }
                 }
                 else
                 {
                     int remainingChips = MaxPerSpot - _InsideBets;
-                    // Debug.Log("remainingChips...  " + remainingChips);
                     BettingRules.ins.currentChip = BettingRules.ins.currentChip + remainingChips;
-                    // Debug.Log("Betting.currentChip...  " + BettingRules.ins.currentChip + "  CurrentChips...  " + CurrentChips + "  Betting.CurrentChipsValue... " + BettingRules.ins.CurrentChipsValue);
 
                     if(ParentObj.GetComponent<ChipsOnTable>().RefObj.tag == "StraightBet")
                     {
@@ -313,15 +295,11 @@ public class RouletteRules : MonoBehaviour
                     BettingRules.ChipsValue = BettingRules.ins.CurrentChipsValue;
                     if(ParentObj.tag == "InsideBet")
                     {
-                        Debug.LogError("_TotalInsideBets... " + _TotalInsideBets);
                         _TotalInsideBets = _TotalInsideBets + remainingChips;
-                        Debug.Log("CurrentChips...  " + remainingChips + "  _TotalInsideBets...  " + _TotalInsideBets);
                     }
                     else if(ParentObj.tag == "OutsideBet")
                     {
-                        Debug.LogError("_TotalOutsideBets....  " + _TotalOutsideBets);
                         _TotalOutsideBets = _TotalOutsideBets + remainingChips;
-                        Debug.Log("CurrentChips...  " + remainingChips + "  _TotalOutsideBets...  " + _TotalOutsideBets);
                     }
                 }
         }
@@ -361,7 +339,6 @@ public class RouletteRules : MonoBehaviour
         val = string.Format("{0:C}", num);
         val = val.Remove(0, 1);
         val = val.Replace(".00", "").Replace(" ", "");
-        // Debug.Log(num.ToString("C", CultureInfo.CurrentCulture));
         return val;
     }
 
@@ -383,7 +360,6 @@ public class RouletteRules : MonoBehaviour
         BettingRules.ins.chip500.gameObject.transform.GetChild(0).gameObject.SetActive(false);
         BettingRules.ins.chip1000.gameObject.transform.GetChild(0).gameObject.SetActive(false);
 
-        Debug.LogError("theActiveToggle.name.... " + theActiveToggle.name);
         switch (int.Parse(theActiveToggle.name))
         {
             case 1:

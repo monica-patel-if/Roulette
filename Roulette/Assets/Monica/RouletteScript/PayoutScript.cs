@@ -113,14 +113,12 @@ public class PayoutScript :  MonoBehaviour
                 string[] _bracesString_1 = RouletteRules.ins.SplitsBets[i].name.Split(char.Parse(")"));
                 string[] _bracesString_2 = _bracesString_1[0].Split(Char.Parse("("));
                 string[] _finalSplit = _bracesString_2[1].Split(Char.Parse("-"));
-                Debug.LogError("Val 2... " + _finalSplit[0] + "    " + _finalSplit[1]);
                 _splitVal_1 = int.Parse(_finalSplit[0]);
                 _splitVal_2 = int.Parse(_finalSplit[1]);
                 if( _GenNo == _splitVal_1 || _GenNo == _splitVal_2 )
                 {
                     PayoutPts = PayoutPts + RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().myChipValue * 17;
                     RouletteRules.ins.SplitsBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                    Debug.LogError("Payout...2...split... " + PayoutPts);
                 }
             }
             for(int i = 0; i < RouletteRules.ins.SquareBets.Count; i++)
@@ -137,7 +135,6 @@ public class PayoutScript :  MonoBehaviour
                 {
                     PayoutPts = PayoutPts + RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().myChipValue * 8;
                     RouletteRules.ins.SquareBets[i].GetComponent<ObjectDetails>().ParentObj.SetActive(true);
-                    Debug.LogError("Payout..corner.. " + PayoutPts);
                 }
             }
             for(int i = 0; i < RouletteRules.ins.StreetBets.Count; i++)
@@ -636,13 +633,11 @@ public class PayoutScript :  MonoBehaviour
 
 
         string _unremovedStr = UIManager.ins.RackTxt.text;
-        Debug.Log("_unremovedStr...  " + _unremovedStr);
         int pos = _unremovedStr.IndexOf(",");
         int _betsValue;
         if( pos >= 0 )
         {
             string racktxt_oldval = _unremovedStr.Replace(",", "");
-            Debug.Log("_racktxt_oldval... " + racktxt_oldval);
             _betsValue = int.Parse(racktxt_oldval);
         }
         else
@@ -659,14 +654,11 @@ public class PayoutScript :  MonoBehaviour
         {
             string racktxt_newval = _unremovedComma.Replace(",", "");
             UIManager.ins.BankRollTxt.text = RouletteRules.ins.NumberFormat( int.Parse(racktxt_newval) + BettingRules.ins.potedAmound);
-            Debug.Log("UIManager.ins.BankRollTxt.text....  " + UIManager.ins.BankRollTxt.text);
         }
         else
         {
             UIManager.ins.BankRollTxt.text = RouletteRules.ins.NumberFormat( int.Parse(UIManager.ins.RackTxt.text) + BettingRules.ins.potedAmound);
         }
-        Debug.Log("_betsValue... " + _betsValue + "  " + "  _losePayouts... " + _losePayouts);
-        Debug.LogError("Payouts... " + PayoutPts);
 
         for (int k = 0; k < 39; k++)
         {
@@ -677,14 +669,11 @@ public class PayoutScript :  MonoBehaviour
 
                 if(_graphVal.ContainsKey(_GenNo.ToString()))
                 {
-                    // Debug.LogError( _GenNo + " _graphVal Key..1.. " + _graphVal[_GenNo.ToString()]);
                     _graphVal[_GenNo.ToString()] = UIManager.ins.myGraphStatastics.DataSource.GetValue(_GenNo.ToString(), UIManager.ins.barGroupName);
-                    // Debug.LogError( _GenNo + " _graphVal Key..2.. " + _graphVal[_GenNo.ToString()]);
                 }
                 else
                 {
                     _graphVal.Add(_GenNo.ToString(), UIManager.ins.myGraphStatastics.DataSource.GetValue(_GenNo.ToString(), UIManager.ins.barGroupName));
-                    // Debug.LogError( _GenNo + " _graphVal Key..3.. " + _graphVal[_GenNo.ToString()]);
                 }
             }
         }
@@ -716,12 +705,10 @@ public class PayoutScript :  MonoBehaviour
             int m = 0;
             for(int j = 0; j < _storedDic.Count - 4 && j < 4; j++)
             {
-                Debug.LogError(j + "   Lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
                 for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
                 {
                     if(int.Parse(_storedDic.ElementAt(j).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
                     {
-                        Debug.LogError("_GenNo... " + _GenNo);
                         if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
                         {
                             // Debug.Log("1 low");
@@ -756,7 +743,6 @@ public class PayoutScript :  MonoBehaviour
                 {
                     for(int n = m; n <= m; n++)
                     {
-                        Debug.Log("n...  " + n + "  m... " + m);
                         for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
                         {
                             if(int.Parse(_storedDic.ElementAt(k).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
@@ -798,29 +784,24 @@ public class PayoutScript :  MonoBehaviour
             for(int k = _storedDic.Count - 1; k >= 0 ; k--)
             {
                 // Debug.LogError("K... " + k + "  n... " + n);
-                Debug.LogError(k +  "   Hightest order...  " + _storedDic.ElementAt(k).Key + "  val... " + _storedDic.ElementAt(k).Value);
                 for(int n = m; n <= m; n++)
                 {
                     for( int i = 0; i < RouletteRules.ins.Manual_StraightBets.Count; i++ )
                     {
                         if(int.Parse(_storedDic.ElementAt(k).Key) == int.Parse(RouletteRules.ins.Manual_StraightBets[i].name) )
                         {
-                            Debug.LogError("_gen... " + _GenNo);
                             if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Red" )
                             {
-                                Debug.Log("1 high.else");
                                 HotNumber_List[n].transform.parent.gameObject.SetActive(true);
                                 HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.75f, 0, 0.067f, 1.0f);
                             }
                             else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "green" )
                             {
-                                Debug.Log("2 high.else");
                                 HotNumber_List[n].transform.parent.gameObject.SetActive(true);
                                 HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0.27f, 0.46f, 0.22f, 1.0f);
                             }
                             else if( RouletteRules.ins.Manual_StraightBets[i].GetComponent<ObjectDetails>()._chipColorPty == "Black" )
                             {
-                                Debug.Log("3 high.else");
                                 HotNumber_List[n].transform.parent.gameObject.SetActive(true);
                                 HotNumber_List[n].transform.parent.gameObject.GetComponent<Image>().color = new Color(0, 0, 0, 1.0f);
                             }
@@ -852,13 +833,6 @@ public class PayoutScript :  MonoBehaviour
         _RollBtn.interactable = true;
     }
 
-    public void NumberVal()
-    {
-        for(int j = 0; j < _storedDic.Count; j++)
-        {
-            Debug.LogError(j + "   lowest order...  " + _storedDic.ElementAt(j).Key + "  val... " + _storedDic.ElementAt(j).Value);
-        }
-    }
 
     IEnumerator DiceRolled()
     {
@@ -870,9 +844,7 @@ public class PayoutScript :  MonoBehaviour
         RollObj.transform.GetComponent<RectTransform>().localScale = Vector3.one;
         RollObj.transform.GetComponent<RectTransform>().localPosition = new Vector3(RollObj.transform.GetComponent<RectTransform>().localPosition.x, RollObj.transform.GetComponent<RectTransform>().localPosition.y, 0);
         Roulette_Rolldata r1 = RollObj.GetComponent<Roulette_Rolldata>();
-        // r1.Currentbet_txt.text = UIManager.ins.symbolsign + RouletteRules.ins.NumberFormat(BettingRules.ins.potedAmound);
         r1.Currentbet_txt.text = PlayerPrefs.GetInt("CurrentBets").ToString();
-        Debug.Log("Curentbets..text...  " + r1.Currentbet_txt.text);
         if(PayoutPts <= 0)
         {
             // r1.Payoutpts_txt.color = new Color(1.0f, 0, 0, 1.0f);           //REd color...
