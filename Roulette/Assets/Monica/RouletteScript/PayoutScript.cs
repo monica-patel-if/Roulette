@@ -36,7 +36,6 @@ public class PayoutScript :  MonoBehaviour
 
     public void PayoutRoulette()
     {
-        Debug.Log("CB... " + UIManager.ins.BetsTxt.text + "  TIB...  " + RouletteRules._TotalInsideBets + "  TOB... " + RouletteRules._TotalOutsideBets);
         if( RouletteRules._TotalInsideBets < UIManager.ins.Inside_TMinBet )
         {
             for(int i = 0; i < RouletteRules.ins.StraightBets.Count; i++)
@@ -846,9 +845,9 @@ public class PayoutScript :  MonoBehaviour
 
     IEnumerator rollDice()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1.0f);
         _BetsTxt.text = "Place Your Bets";
-        // yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(2.0f);
         NomoreBetsPanel.SetActive(false);
         _RollBtn.interactable = true;
     }
@@ -863,7 +862,7 @@ public class PayoutScript :  MonoBehaviour
 
     IEnumerator DiceRolled()
     {
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(0.9f);
         GameObject RollObj = Instantiate(RouletteRules.ins.RollsPrefab);
         RollObj.transform.SetParent(RouletteRules.ins.RollsPanel.transform.GetChild(0).transform);
         RollObj.transform.SetSiblingIndex(0);
