@@ -43,16 +43,16 @@ public class UIManager : MonoBehaviour
         Outside_MaxBetPerSpot = 500;
         Inside_TMinBet = 15;
         Outside_TMinBet = 100;
-        PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable(0));
+        PlayNowBtn.onClick.AddListener(() => UIManager.ins.SetTable());
     }
-    public void SetTable(int id)
+    public void SetTable()
     {
-       Debug.Log(" set table 0 " + id);
+    //    Debug.Log(" set table 0 " + id);
        MenuPanel.SetActive(false);
-        SetTableValueFromDB(id);
+        SetTableValueFromDB();
     }
 
-    public void SetTableValueFromDB(int id)
+    public void SetTableValueFromDB()
     {
         forSinglePlayer();
     }
